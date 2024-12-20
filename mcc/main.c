@@ -7,14 +7,22 @@
 就能够运行这个可执行文件。
 */
 int main(int argc,char *argv[]){
+    printf("Total %d\n",argc);
     //打开文件
-    File * f = fopen(agrv[0],r);
+    FILE * f = fopen(argv[1],"r");
     //得到中间代码
         //词法和语法分析
+    char temp;
+    while(!feof(f)&&(temp=fgetc(f) ) ){
+        printf("%c\n",temp);
+    }
         //语义分析
         //中间代码生成
     //关闭文件
     fclose(f);
     //生成可执行文件
+    printf("exe was created!\n");
     //执行可执行文件
+    
+    return 0;
 }
