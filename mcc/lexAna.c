@@ -129,9 +129,11 @@ char getc_er(FILE* f){
     }
     else if(feof(f)){
         fprintf(stderr,"File went to the end but the program still wants to get a charater!\n");
+        return EOF;
     }
     else{
         fprintf(stderr,"The process of reading file meets problems!\n");
+        return EOF;
     }
 
 }
@@ -309,8 +311,11 @@ void lexAna(FILE * f,token* output,C_List* cl){
                 while( getc_er(f)!='*');
                 if( getc_er(f)=='/')break;
             }
-            ungetc(temp,f);
-            token_crea(output,te);
+            else{
+                ungetc(temp,f);
+                token_crea(output,te);
+                break;
+            }
             break;
         
         case ';':

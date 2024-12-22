@@ -28,7 +28,8 @@ int main(int argc,char *argv[]){
     int ii =0 ;
     while(!feof(f)&&!ferror(f)){
         lexAna(f,temp_token,cl);
-        if(temp_token->kind_num!=0)printf("%d\t%s\t%d\n",++ii,temp_token->va,temp_token->kind_num);
+        if(temp_token->kind_num!=0)
+        printf("%d\t%s\t%d\n",++ii,temp_token->va,temp_token->kind_num);
     }
 
     showC_List(cl);
@@ -36,9 +37,9 @@ int main(int argc,char *argv[]){
         //语义分析
         //中间代码生成
     //关闭文件
-    free(cl);
-    free(temp_token);
-    fclose(f);
+    //free(cl);
+    //free(temp_token);
+    //fclose(f);
     //生成可执行文件
     printf("\nexe was created!\n");
     //执行可执行文件
