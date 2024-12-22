@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "lexAna.h"
+
 /*
     words and tokens' list:
     words,kind number,valve
@@ -35,44 +36,67 @@
     const_nums,27,indicator in num list
 */
 
-
-
-void token_init(token* t){
-    t = malloc(sizeof(token));
-    for(int i=0;i<token_max;i++){
+void token_clear(token * t){
+    for(int i=0;i<token_max+1;i++){
         t->va[i]='\0';
     }
     t->va_temp = 0;
     t->kind_num = 0;
 }
-
 void token_crea(token* t,char* input){
+    //printf("\ntoken_crea was called,input is: %s\n",input);
     strcpy(t->va,input);
-    if(strcmp(input,"int"))t->kind_num = 1;
-    else if(strcmp(input,"void"))t->kind_num = 2;
-    else if(strcmp(input,"main"))t->kind_num = 3;
-    else if(strcmp(input,"if"))t->kind_num = 4;
-    else if(strcmp(input,"else"))t->kind_num = 5;
-    else if(strcmp(input,"while"))t->kind_num = 6;
-    else if(strcmp(input,"break"))t->kind_num = 7;
-    else if(strcmp(input,"return"))t->kind_num = 8;
-    else if(strcmp(input,"input"))t->kind_num = 9;
-    else if(strcmp(input,"output"))t->kind_num = 10;
-    else if(strcmp(input,"+"))t->kind_num = 11;
-    else if(strcmp(input,"-"))t->kind_num = 12;
-    else if(strcmp(input,"*"))t->kind_num = 13;
-    else if(strcmp(input,"/"))t->kind_num = 14;
-    else if(strcmp(input,"<"))t->kind_num = 15;
-    else if(strcmp(input,">"))t->kind_num = 16;
-    else if(strcmp(input,"="))t->kind_num = 17;
-    else if(strcmp(input,"<="))t->kind_num = 18;
-    else if(strcmp(input,">="))t->kind_num = 19;
-    else if(strcmp(input,"=="))t->kind_num = 20;
-    else if(strcmp(input,";"))t->kind_num = 21;
-    else if(strcmp(input,"("))t->kind_num = 22;
-    else if(strcmp(input,")"))t->kind_num = 23;
-    else if(strcmp(input,"{"))t->kind_num = 24;
-    else if(strcmp(input,"}"))t->kind_num = 25;
+    if(strcmp(input,"int")==0)t->kind_num = 1;
+    else if(strcmp(input,"void")==0)t->kind_num = 2;
+    else if(strcmp(input,"main")==0)t->kind_num = 3;
+    else if(strcmp(input,"if")==0)t->kind_num = 4;
+    else if(strcmp(input,"else")==0)t->kind_num = 5;
+    else if(strcmp(input,"while")==0)t->kind_num = 6;
+    else if(strcmp(input,"break")==0)t->kind_num = 7;
+    else if(strcmp(input,"return")==0)t->kind_num = 8;
+    else if(strcmp(input,"input")==0)t->kind_num = 9;
+    else if(strcmp(input,"output")==0)t->kind_num = 10;
+    else if(strcmp(input,"+")==0)t->kind_num = 11;
+    else if(strcmp(input,"-")==0)t->kind_num = 12;
+    else if(strcmp(input,"*")==0)t->kind_num = 13;
+    else if(strcmp(input,"/")==0)t->kind_num = 14;
+    else if(strcmp(input,"<")==0)t->kind_num = 15;
+    else if(strcmp(input,">")==0)t->kind_num = 16;
+    else if(strcmp(input,"=")==0)t->kind_num = 17;
+    else if(strcmp(input,"<=")==0)t->kind_num = 18;
+    else if(strcmp(input,">=")==0)t->kind_num = 19;
+    else if(strcmp(input,"==")==0)t->kind_num = 20;
+    else if(strcmp(input,";")==0)t->kind_num = 21;
+    else if(strcmp(input,"(")==0)t->kind_num = 22;
+    else if(strcmp(input,")")==0)t->kind_num = 23;
+    else if(strcmp(input,"{")==0)t->kind_num = 24;
+    else if(strcmp(input,"}")==0)t->kind_num = 25;
+    else ;
+}
+
+int addToC_List(C_List* cl,char* input){
+    //return the position of inp ut(actually  a const number) in NumList
+    for(int i=0;i<cl->total;i++){
+        if(strcmp(cl->list[i],input)==0){
+            return i;
+        }
+    }
+    strcpy(cl->list[cl->total++],input);
+    return cl->total-1 ; 
+}
+void C_List_init(C_List* cl){
+    for(int i=0;i<list_len;i++){
+        strcpy(cl->list[i],"");
+    }
+    cl->temp_posi = 0;
+    cl->total = 0;
+}
+void showC_List(C_List* cl){
+    printf("\nshowC_List\n");
+    for(int i=0;i<cl->total;i++){
+        printf("%d\t%s\n",i,cl->list[i]);
+    }
+    printf("total=%d\t\ttemp_posi=%d\n",cl->total,cl->temp_posi);
 }
 
 char get(FILE *f){//Get a char.Skip the possible blankspaces.
@@ -99,16 +123,31 @@ char get(FILE *f){//Get a char.Skip the possible blankspaces.
     }
     return temp;
 }
+char getc_er(FILE* f){
+    if(!feof(f)&&!ferror(f)){
+        return getc(f);
+    }
+    else if(feof(f)){
+        fprintf(stderr,"File went to the end but the program still wants to get a charater!\n");
+    }
+    else{
+        fprintf(stderr,"The process of reading file meets problems!\n");
+    }
+
+}
 
 /*
     The lexAna() function return one token 
     from a file indicator 
     every time it is called.
 */
-void lexAna(FILE * f,token* output){
-    char te[token_max];//Memory one token temporarily and return it.
+void lexAna(FILE * f,token* output,C_List* cl){
+    token_clear(output);            
+    char te[token_max]={'\0'};//Memory one token temporarily and return it.
     int i=0;
-    char temp = get(f);
+    char temp;
+    temp = get(f);
+    if(temp=='\0')return;
     switch(temp){
         case 'a':
         case 'b':
@@ -136,13 +175,62 @@ void lexAna(FILE * f,token* output){
         case 'x':
         case 'y':
         case 'z':
-            *te = temp;
-            i++;
-            while(isalpha(temp = getc(f))){
+            te[i++] = temp;
+            while((temp = getc_er(f))>='a'&& temp<='z'){
                 te[i++] = temp;
             }
-            ungetc(temp,f);
-            token_crea(output,te);
+            switch(temp){
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'E':
+                case 'F':
+                case 'G':
+                case 'H':
+                case 'I':
+                case 'J':
+                case 'K':
+                case 'L':
+                case 'M':
+                case 'N':
+                case 'O':
+                case 'P':
+                case 'Q':
+                case 'R':
+                case 'S':
+                case 'T':
+                case 'U':
+                case 'V':
+                case 'W':
+                case 'X':
+                case 'Y':
+                case 'Z':
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    te[i++] = temp;
+                    while((temp =  getc_er(f))&&(isalpha(temp)||isdigit(temp))){
+                        te[i++] = temp;
+                    }
+                default:
+                    ungetc(temp,f);
+                    token_crea(output,te);
+                    if(output->kind_num==0){
+                        output->kind_num = 26;
+                        addToC_List(cl,te);
+                        strcpy(output->va,te);
+                    }
+                    break; 
+            }
+            break;
         case 'A':
         case 'B':
         case 'C':
@@ -169,5 +257,74 @@ void lexAna(FILE * f,token* output){
         case 'X':
         case 'Y':
         case 'Z':
+            te[i++] = temp;
+            while((temp = getc_er(f))&&(isalpha(temp)||isdigit(temp))){
+                te[i++] = temp;
+            }
+            ungetc(temp,f);
+            token_crea(output,te);
+            if(output->kind_num ==0){
+                output->kind_num = 26;
+                addToC_List(cl,te);
+                strcpy(output->va,te);
+            }
+            break;
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            te[i++] = temp;
+            while(isdigit(temp =  getc_er(f))){
+                te[i++] = temp;
+            }
+            ungetc(temp,f);
+            output->kind_num=27;
+            addToC_List(cl,te);
+            strcpy(output->va,te);
+            break;
+
+        case '<':
+        case '>':
+        case '=':
+            te[i++] = temp ;
+            if((temp = getc_er(f))==EOF){
+                token_crea(output,te);
+                break;
+            }
+            if(temp == '=' )te[i++] = temp;
+            else ungetc(temp,f);
+            token_crea(output,te);
+            break;
+
+
+        case '/':
+            te[i++] = temp;
+            if((temp = getc_er(f))=='*'){
+                while( getc_er(f)!='*');
+                if( getc_er(f)=='/')break;
+            }
+            ungetc(temp,f);
+            token_crea(output,te);
+            break;
+        
+        case ';':
+        case '+':
+        case '-':
+        case '*':
+        case '(':
+        case ')':
+        case '{':
+        case '}':
+            te[0] = temp;
+            token_crea(output,te);
+            break;
+        default:
+            fprintf(stderr,"\nThe input character can not be recognized!\n");
     }
 }

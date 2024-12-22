@@ -1,8 +1,8 @@
 mcc:mcc.o lexAna.o synAna.o
-	gcc -g lexAna.o synAna.o mcc.o -o mcc
+	gcc -g -pthread lexAna.o synAna.o mcc.o -o mcc
 mcc.o:mcc.c lexAna.h synAna.h
-	gcc -c mcc.c
+	gcc -g -pthread -c mcc.c
 lexAna.o:lexAna.c lexAna.h
-	gcc -c lexAna.c
+	gcc -g -pthread -c lexAna.c
 synAna.o:synAna.c synAna.h
-	gcc -c synAna.c
+	gcc -g -pthread -c synAna.c
