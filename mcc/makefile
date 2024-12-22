@@ -1,5 +1,5 @@
 mcc:mcc.o lexAna.o synAna.o
-	gcc -g mcc.o lexAna.o synAna.o -o mcc
+	gcc -g lexAna.o synAna.o mcc.o -o mcc
 mcc.o:mcc.c lexAna.h synAna.h
 	gcc -c mcc.c
 lexAna.o:lexAna.c lexAna.h

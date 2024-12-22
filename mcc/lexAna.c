@@ -1,6 +1,8 @@
-#include<stdio.h>
-#include<ctype.h>
-#include<string.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+#include "lexAna.h"
 /*
     words and tokens' list:
     words,kind number,valve
@@ -34,8 +36,6 @@
 */
 
 
-
-const token token_list[28];
 
 void token_init(token* t){
     t = malloc(sizeof(token));
@@ -106,7 +106,7 @@ char get(FILE *f){//Get a char.Skip the possible blankspaces.
     every time it is called.
 */
 void lexAna(FILE * f,token* output){
-    char te[token_max];
+    char te[token_max];//Memory one token temporarily and return it.
     int i=0;
     char temp = get(f);
     switch(temp){
@@ -142,7 +142,7 @@ void lexAna(FILE * f,token* output){
                 te[i++] = temp;
             }
             ungetc(temp,f);
-            token_crea(t,te);
+            token_crea(output,te);
         case 'A':
         case 'B':
         case 'C':
