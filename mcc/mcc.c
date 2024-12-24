@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include "lexAna.h"
 /*
+    Usage:
     假设我当前目录下有一文件“test1.cmm”，
-    在当前目录下打开终端，输入“mcc test1.cmm”，
+    meanwhile,"mcc" is in the current directory,
+    (in Windows)在当前目录下打开终端，输入“mcc test1.cmm”，
     就会在当前目录下产生可执行文件“test1.exe”
-    在终端中输入“./test1.exe”，
+    在终端中输入“test1.exe”，
     就能够运行这个可执行文件。
 */
 
@@ -16,9 +18,13 @@ int main(int argc,char *argv[]){
         fprintf(stderr,"Opening process failed.\n");
         return 0;
     }
+    if(argc!=2){
+        fprintf(stderr,"Input parameters' fault!\n");
+        return 0;
+    }
     //得到中间代码...
         //词法和语法分析
-    token* temp_token;//tempor arily store one token which is gotten from function lexAna()
+    token* temp_token;//This temporarily stores one token which is gotten from the function lexAna().
     temp_token = malloc(sizeof(token));
     
     C_List* cl;
@@ -29,20 +35,22 @@ int main(int argc,char *argv[]){
     while(!feof(f)&&!ferror(f)){
         lexAna(f,temp_token,cl);
         if(temp_token->kind_num!=0)
-        printf("%d\t%s\t%d\n",++ii,temp_token->va,temp_token->kind_num);
+            if(temp_token->kind_num!=26 && temp_token->kind_num!= 27)
+                printf("%d\t%s\t\t%d\n",++ii,temp_token->val.valu,temp_token->kind_num);
+            else
+                printf("%d\t%d\t\t%d\n",++ii,temp_token->val.va_posi,temp_token->kind_num);
     }
 
     showC_List(cl);
 
         //语义分析
         //中间代码生成
-    //关闭文件
-    //free(cl);
-    //free(temp_token);
-    //fclose(f);
     //生成可执行文件
     printf("\nexe was created!\n");
-    //执行可执行文件
-    
+
+    //关闭文件
+    free(cl);
+    free(temp_token);
+    //fclose(f);
     return 0;
 }

@@ -38,14 +38,12 @@
 
 void token_clear(token * t){
     for(int i=0;i<token_max+1;i++){
-        t->va[i]='\0';
+        t->val.valu[i]='\0';
     }
-    t->va_temp = 0;
+    t->val.va_posi = -1;
     t->kind_num = 0;
 }
-void token_crea(token* t,char* input){
-    //printf("\ntoken_crea was called,input is: %s\n",input);
-    strcpy(t->va,input);
+void token_crea(C_List* cl,token* t,char* input){
     if(strcmp(input,"int")==0)t->kind_num = 1;
     else if(strcmp(input,"void")==0)t->kind_num = 2;
     else if(strcmp(input,"main")==0)t->kind_num = 3;
@@ -72,15 +70,22 @@ void token_crea(token* t,char* input){
     else if(strcmp(input,"{")==0)t->kind_num = 24;
     else if(strcmp(input,"}")==0)t->kind_num = 25;
     else ;
+    if(t->kind_num<=25&&t->kind_num>=1)
+        strcpy(t->val.valu,input);
+    else{
+        t->kind_num=26?27:isalpha(*input);
+        t->val.va_posi = addToC_List(cl,input);
+    }
 }
 
-int addToC_List(C_List* cl,char* input){
-    //return the position of inp ut(actually  a const number) in NumList
+int addToC_List(C_List* cl,char* input){//Return the position of input in C_List
+    //If input has been in the C_List.
     for(int i=0;i<cl->total;i++){
         if(strcmp(cl->list[i],input)==0){
             return i;
         }
     }
+    //New input.
     strcpy(cl->list[cl->total++],input);
     return cl->total-1 ; 
 }
@@ -88,15 +93,14 @@ void C_List_init(C_List* cl){
     for(int i=0;i<list_len;i++){
         strcpy(cl->list[i],"");
     }
-    cl->temp_posi = 0;
     cl->total = 0;
 }
 void showC_List(C_List* cl){
-    printf("\nshowC_List\n");
+    printf("\nshowC_List:\n");
     for(int i=0;i<cl->total;i++){
         printf("%d\t%s\n",i,cl->list[i]);
     }
-    printf("total=%d\t\ttemp_posi=%d\n",cl->total,cl->temp_posi);
+    printf("total=%d\n",cl->total);
 }
 
 char get(FILE *f){//Get a char.Skip the possible blankspaces.
@@ -109,7 +113,7 @@ char get(FILE *f){//Get a char.Skip the possible blankspaces.
         fprintf(stderr,"File reading process failed!\n");
         return '\0';
     }
-    char temp = getc(f);
+    char temp = getc_er(f);
     while(feof(f)==0 && ferror(f)==0 && isspace((int)temp)){
         if(feof(f)!=0){
             fprintf(stderr,"File is empty!\n");
@@ -119,7 +123,7 @@ char get(FILE *f){//Get a char.Skip the possible blankspaces.
             fprintf(stderr,"File reading process failed!\n");
             return '\0';
         }
-        temp = getc(f);
+        temp = getc_er(f);
     }
     return temp;
 }
@@ -144,12 +148,15 @@ char getc_er(FILE* f){
     every time it is called.
 */
 void lexAna(FILE * f,token* output,C_List* cl){
-    token_clear(output);            
-    char te[token_max]={'\0'};//Memory one token temporarily and return it.
-    int i=0;
     char temp;
+    if((temp=getc(f))==EOF)return;
+    ungetc(temp,f);
     temp = get(f);
-    if(temp=='\0')return;
+
+    token_clear(output);            
+    char te[token_max]={'\0'};//Memory one token temporarily and return it to "output".
+    int i=0;//Serving 'te'.
+
     switch(temp){
         case 'a':
         case 'b':
@@ -224,12 +231,7 @@ void lexAna(FILE * f,token* output,C_List* cl){
                     }
                 default:
                     ungetc(temp,f);
-                    token_crea(output,te);
-                    if(output->kind_num==0){
-                        output->kind_num = 26;
-                        addToC_List(cl,te);
-                        strcpy(output->va,te);
-                    }
+                    token_crea(cl,output,te);
                     break; 
             }
             break;
@@ -264,12 +266,7 @@ void lexAna(FILE * f,token* output,C_List* cl){
                 te[i++] = temp;
             }
             ungetc(temp,f);
-            token_crea(output,te);
-            if(output->kind_num ==0){
-                output->kind_num = 26;
-                addToC_List(cl,te);
-                strcpy(output->va,te);
-            }
+            token_crea(cl,output,te);
             break;
         case '0':
         case '1':
@@ -286,25 +283,20 @@ void lexAna(FILE * f,token* output,C_List* cl){
                 te[i++] = temp;
             }
             ungetc(temp,f);
-            output->kind_num=27;
-            addToC_List(cl,te);
-            strcpy(output->va,te);
+            token_crea(cl,output,te);
             break;
-
         case '<':
         case '>':
         case '=':
             te[i++] = temp ;
             if((temp = getc_er(f))==EOF){
-                token_crea(output,te);
+                token_crea(cl,output,te);
                 break;
             }
             if(temp == '=' )te[i++] = temp;
             else ungetc(temp,f);
-            token_crea(output,te);
+            token_crea(cl,output,te);
             break;
-
-
         case '/':
             te[i++] = temp;
             if((temp = getc_er(f))=='*'){
@@ -313,11 +305,10 @@ void lexAna(FILE * f,token* output,C_List* cl){
             }
             else{
                 ungetc(temp,f);
-                token_crea(output,te);
+                token_crea(cl,output,te);
                 break;
             }
             break;
-        
         case ';':
         case '+':
         case '-':
@@ -327,7 +318,7 @@ void lexAna(FILE * f,token* output,C_List* cl){
         case '{':
         case '}':
             te[0] = temp;
-            token_crea(output,te);
+            token_crea(cl,output,te);
             break;
         default:
             fprintf(stderr,"\nThe input character can not be recognized!\n");
