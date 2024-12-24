@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "lexAna.h"
+#include "synAna.h"
+#include "C_List.h"
+
 /*
     Usage:
     假设我当前目录下有一文件“test1.cmm”，
@@ -51,6 +54,11 @@ int main(int argc,char *argv[]){
     //关闭文件
     free(cl);
     free(temp_token);
+
+    /*
+        If do not ignore the line below,error will be thrown out in ubuntu,which 
+        will do not happen in windows.
+    */
     //fclose(f);
     return 0;
 }
