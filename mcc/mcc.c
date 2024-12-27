@@ -14,6 +14,26 @@
     就能够运行这个可执行文件。
 */
 
+/*
+    Features of the language C--:
+    1.大小写敏感
+    2.只支持int和void类型
+    4.空格包含空白、回车符、换行符和制表符
+    5.语言的表达式包括整数上的算数表达式和整数间比较的布尔表达式
+    6.分号分隔，花括号包含多条语句序列
+    7.程序由函数声明和变量声明组成，必须先声明后使用
+    程序的最后一个声明必须是主入口函数声明void main(void)
+    8.输入函数int input(void)，输出函数void output(int)分别实现从标准输入设备（键盘）
+    读入一个整数值和将一个整数值和换行符打印到标准输出设备（屏幕）；
+    9.支持if-else、while和return控制语句；
+    10. C--语言不支持数组和递归函数。
+*/
+
+/*
+    The grammar of C--:
+
+*/
+
 int main(int argc,char *argv[]){
     //打开文件
     FILE * f = fopen(argv[1],"r");

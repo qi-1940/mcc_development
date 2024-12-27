@@ -74,7 +74,7 @@ void token_crea(C_List* cl,token* t,char* input){
     if(t->kind_num<=25&&t->kind_num>=1)
         strcpy(t->val.valu,input);
     else{
-        t->kind_num=26?27:isalpha(*input);
+        t->kind_num=isalpha(input[0])?26:27;
         t->val.va_posi = addToC_List(cl,input);
     }
 }

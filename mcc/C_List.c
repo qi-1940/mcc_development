@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "C_List.h"
 
 int addToC_List(C_List* cl,char* input){//Return the position of input in C_List
