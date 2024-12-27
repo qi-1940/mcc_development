@@ -29,10 +29,7 @@
     10. C--语言不支持数组和递归函数。
 */
 
-/*
-    The grammar of C--:
 
-*/
 
 int main(int argc,char *argv[]){
     //打开文件

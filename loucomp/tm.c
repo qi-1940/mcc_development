@@ -354,7 +354,7 @@ STEPRESULT stepTM (void)
       { printf("Enter value for IN instruction: ") ;
         fflush (stdin);
         fflush (stdout);
-        gets(in_Line);
+        fgets(in_Line,120,stdin);
         lineLen = strlen(in_Line) ;
         inCol = 0;
         ok = getNum();
@@ -407,7 +407,7 @@ int doCommand (void)
   { printf ("Enter command: ");
     fflush (stdin);
     fflush (stdout);
-    gets(in_Line);
+    fgets(in_Line,120,stdin);
     lineLen = strlen(in_Line);
     inCol = 0;
   }

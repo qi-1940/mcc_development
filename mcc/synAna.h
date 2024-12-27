@@ -5,9 +5,15 @@
 
 #define CHILD_NUM_MAX 100
 
+//terminal symbols
 typedef enum {INT=1,VOID,MAIN,IF,ELSE,WHILE,BREAK,RETURN,INPUT,OUTPUT,
 ADD,SUB,MUL,DIV,LESS,MORE,SIGNAL_EQUAL,LESS_EQUAL,MORE_EQUAL,EQUAL,SEMI,
 L_PAR,R_PAR,L_BRACE,R_BRACE,ID,C_NUM}type;
+
+//non-terminal symbols and their production methods
+/*
+    expression: E ::= 
+*/
 
 struct node_
 {
