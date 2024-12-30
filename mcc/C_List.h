@@ -1,8 +1,7 @@
 #ifndef C_LIST_H
 #define C_LIST_H
 
-#define list_len 40
-#define cl_len 15
+#include "restrictions.h"
 
 typedef struct {
     char list[list_len][cl_len];

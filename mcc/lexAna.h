@@ -2,8 +2,7 @@
 #define LEXANA_H
 
 #include "C_List.h"
-
-#define token_max 50
+#include "restrictions.h"
 
 typedef union{
     char valu[token_max+1];

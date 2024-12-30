@@ -35,6 +35,7 @@
     },25,-
     identifiers,26,indicator in tokens' list
     const_nums,27,indicator in num list
+    
 */
 
 void token_clear(token * t){
