@@ -45,6 +45,7 @@ void token_clear(token * t){
     t->val.va_posi = -1;
     t->kind_num = 0;
 }
+
 void token_crea(C_List* cl,token* t,char* input){
     if(strcmp(input,"int")==0)t->kind_num = 1;
     else if(strcmp(input,"void")==0)t->kind_num = 2;
@@ -80,8 +81,6 @@ void token_crea(C_List* cl,token* t,char* input){
     }
 }
 
-
-
 char get(FILE *f){//Get a char.Skip the possible blankspaces.
     if(feof(f)!=0){
         fprintf(stderr,"File is empty!\n");
@@ -106,6 +105,7 @@ char get(FILE *f){//Get a char.Skip the possible blankspaces.
     }
     return temp;
 }
+
 char getc_er(FILE* f){
     if(!feof(f)&&!ferror(f)){
         return getc(f);
@@ -126,9 +126,9 @@ char getc_er(FILE* f){
     from a file indicator 
     every time it is called.
 */
-void lexAna(FILE * f,token* output,C_List* cl){
+int lexAna(FILE * f,token* output,C_List* cl){
     char temp;
-    if((temp=getc(f))==EOF)return;
+    if((temp=getc(f))==EOF)return 0;
     ungetc(temp,f);
     temp = get(f);
 
@@ -302,4 +302,5 @@ void lexAna(FILE * f,token* output,C_List* cl){
         default:
             fprintf(stderr,"\nThe input character can not be recognized!\n");
     }
+    return output->kind_num;
 }

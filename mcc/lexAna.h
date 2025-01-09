@@ -19,6 +19,6 @@ void token_crea(C_List*,token*,char*);
 char get(FILE*);//Get a char.Skip the possible blankspaces.
 char getc_er(FILE*);
 
-void lexAna(FILE*,token*,C_List*);
+int lexAna(FILE* f,token*,C_List*);
 
 #endif

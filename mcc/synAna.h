@@ -4,10 +4,8 @@
 #include "C_List.h"
 #include "restrictions.h"
 
-
-
 //terminal symbols
-typedef enum {INT=1,VOID,MAIN,IF,ELSE,WHILE,BREAK,RETURN,INPUT,OUTPUT,
+typedef enum {EOF_=0,INT=1,VOID,MAIN,IF,ELSE,WHILE,BREAK,RETURN,INPUT,OUTPUT,
 ADD,SUB,MUL,DIV,LESS,MORE,SIGNAL_EQUAL,LESS_EQUAL,MORE_EQUAL,EQUAL,SEMI,
 L_PAR,R_PAR,L_BRACE,R_BRACE,ID,C_NUM}type;
 
@@ -15,8 +13,10 @@ L_PAR,R_PAR,L_BRACE,R_BRACE,ID,C_NUM}type;
 /*
     grammar:
 
-    (expression)E ::= C_NUM R
-    R::=+ C_NUM R | NULL
+    S(beginning) ::= A
+    A ::= C_NUM A_
+    A_ ::= ADD C_NUM A_ | EOF
+    
 */
 
 typedef union{
@@ -36,11 +36,17 @@ struct node_
 typedef struct node_ node;
 typedef node* node_ptr;
 
-void nodeInit(node_ptr root);
-void showParseTree(node_ptr input);
-void addToParseTree_Ter(node_ptr root,type input,int a,FILE* f,C_List* cl);
-void addToParseTree_NonTer(node_ptr root,char nonTe);
-void E(type input,node_ptr root,FILE* f,C_List* cl);
-void synAna(node_ptr root,FILE* f,C_List* cl);
+void nodeInit(node_ptr);
+void showParseTree(node_ptr);
+void addToParseTree_Ter(node_ptr);
+node_ptr addToParseTree_NonTer(node_ptr,char);
+void S(node_ptr);
+void A(node_ptr);
+void B(node_ptr);
+void C(node_ptr);
+void D(node_ptr);
+void E(node_ptr);
+void synAna(FILE*,node_ptr,C_List*);
+void eat(type,node_ptr);
 
 #endif

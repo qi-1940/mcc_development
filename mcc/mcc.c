@@ -10,6 +10,7 @@
     假设我当前目录下有一文件“test.cmm”，
     meanwhile,"mcc" is under the current directory,
     (in Windows)在当前目录下打开终端，输入“mcc test.cmm”，
+    (in Linux)Please input "./mcc test.cmm".
      
 */
 
@@ -31,7 +32,7 @@
 
 int main(int argc,char *argv[]){
     //打开文件
-    FILE * f = fopen(argv[1],"r");
+    FILE* f = fopen(argv[1],"r");
     if(f == NULL){
         fprintf(stderr,"Opening process failed.\n");
         return 0;
@@ -52,12 +53,13 @@ int main(int argc,char *argv[]){
     cl = malloc(sizeof(list_len));
     C_List_init(cl);
 
-    while(!feof(f)&&!ferror(f)){
-        synAna(root,f,cl);
+    if(!feof(f)&&!ferror(f)){
+        synAna(f,root,cl);
     }
 
     showParseTree(root);
 
+    //showC_List(cl);
     //语义分析
 
     //关闭文件
