@@ -64,20 +64,198 @@ node_ptr addToParseTree_NonTer(node_ptr root,char nonTe){
     }
 }
 
-void eat(type what,node_ptr root){
+int eat(type what,node_ptr root){
     if(what==temp_type){
         addToParseTree_Ter(root);
         token* temp_token = malloc(sizeof(token));
         temp_type = lexAna(f,temp_token,cl);
     }
     else{
-        fprintf(stderr,"Match error!\n");
+        return -1;
     }
+    return 0;
 }
 
 void S(node_ptr root){
-    A(addToParseTree_NonTer(root,'S'));
+    node_ptr temp = addToParseTree_NonTer(root,'S');
+    //R(temp);
+    O(temp);
 }
+
+void R(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'R');
+    
+}
+
+void O(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'O');
+    switch (temp_type){
+        case VOID:
+            eat(VOID,temp);
+            eat(MAIN,temp);
+            eat(L_PAR,temp);
+            eat(VOID,temp);
+            eat(R_PAR,temp);
+            eat(L_BRACE,temp);
+            M(temp);
+            eat(R_BRACE,temp);
+            break;
+        default:
+            fprintf(stderr,"O syntactic error!\n");
+    }
+}
+
+int W(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'W');
+    if(Q(temp)==-1){
+        return -1;
+    }
+    if(eat(L_BRACE,temp)==-1){
+        return -1;
+    }
+    M(temp);
+    if(eat(R_BRACE,temp)==-1){
+        return -1;
+    }
+}
+
+void Y(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'Y');
+}
+
+int Q(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'Q');
+    P(temp);
+    eat(L_PAR,temp);
+    P(temp);
+    eat(R_PAR,temp);
+}
+
+int M(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'M');
+    T(temp);
+    H(temp);
+}
+
+void P(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'P');
+    switch (temp_type){
+    case INT:
+        eat(INT,temp);
+        eat(ID,temp);
+        break;
+    case VOID:
+        eat(VOID,temp);
+        break;
+    default:
+        fprintf(stderr,"P syntactic error!\n");
+    }
+}
+
+void Z(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'Z');
+}
+
+int T(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'T');
+    switch (temp_type){
+        case IF:
+            I(temp);
+            break;
+        case WHILE:
+            F(temp);
+            break;
+        case INT:
+            eat(INT,temp);
+            eat(ID,temp);
+            eat(SEMI,temp);
+            break;
+        case VOID:
+            eat(VOID,temp);
+            eat(ID,temp);
+            eat(SEMI,temp);
+            break; 
+        case ID:
+            eat(ID,temp);
+            eat(SIGNAL_EQUAL,temp);
+            A(temp);
+            eat(SEMI,temp);
+            break;
+        case INPUT:
+            eat(INPUT,temp);
+            eat(L_PAR,temp);
+            eat(R_PAR,temp);
+            break;
+        case OUTPUT:
+            eat(OUTPUT,temp);
+            eat(L_PAR,temp);
+            A(temp);
+            eat(R_PAR,temp);
+            break;
+        default:
+            return -1;
+    }
+    return 0;
+}
+
+int H(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'H');
+    if(T(temp)==-1){
+        return -1;
+    }
+    if(H(temp)==-1){
+        return -1;
+    }
+    return 0;
+}
+
+void F(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'F');
+    eat(WHILE,temp);
+    eat(L_PAR,temp);
+    V(temp);
+    eat(R_PAR,temp);
+    eat(L_BRACE,temp);
+    M(temp);
+    eat(R_BRACE,temp);
+}
+
+void V(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'V');
+    A(temp);
+    switch (temp_type){
+        case MORE_EQUAL:
+            eat(MORE_EQUAL,temp);
+            A(temp);
+            break;
+        case LESS_EQUAL:
+            eat(LESS_EQUAL,temp);
+            A(temp);
+            break;
+        case EQUAL:
+            eat(EQUAL,temp);
+            A(temp);
+            break;
+        default:
+            fprintf(stderr,"V syntactic error!\n");
+    }
+}
+
+void I(node_ptr root){
+    node_ptr temp = addToParseTree_NonTer(root,'I');
+    eat(IF,temp);
+    eat(L_PAR,temp);
+    V(temp);
+    eat(R_PAR,temp);
+    eat(L_BRACE,temp);
+    M(temp);
+    eat(R_BRACE,temp);
+    eat(ELSE,temp);
+    eat(L_BRACE,temp);
+    M(temp);
+    eat(R_BRACE,temp);
+}
+
 
 void A(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'A');

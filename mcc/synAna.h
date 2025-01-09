@@ -5,9 +5,11 @@
 #include "restrictions.h"
 
 //terminal symbols
-typedef enum {EOF_=0,INT=1,VOID,MAIN,IF,ELSE,WHILE,BREAK,RETURN,INPUT,OUTPUT,
-ADD,SUB,MUL,DIV,LESS,MORE,SIGNAL_EQUAL,LESS_EQUAL,MORE_EQUAL,EQUAL,SEMI,
-L_PAR,R_PAR,L_BRACE,R_BRACE,ID,C_NUM}type;
+typedef enum {EOF_=0,INT=1,VOID=2,MAIN=3,IF=4,ELSE=5,WHILE=6
+,BREAK=7,RETURN=8,INPUT=9,OUTPUT=10,
+ADD=11,SUB=12,MUL=13,DIV=14,LESS=15,MORE=16,SIGNAL_EQUAL=17
+,LESS_EQUAL=18,MORE_EQUAL=19,EQUAL=20,SEMI=21,
+L_PAR=22,R_PAR=23,L_BRACE=24,R_BRACE=25,ID=26,C_NUM=27}type;
 
 //non-terminal symbols and their production methods
 /*
@@ -46,6 +48,19 @@ void B(node_ptr);
 void C(node_ptr);
 void D(node_ptr);
 void E(node_ptr);
+void R(node_ptr);
+void O(node_ptr);
+void W(node_ptr);
+void Y(node_ptr);
+void Q(node_ptr);
+void M(node_ptr);
+void P(node_ptr);
+void Z(node_ptr);
+int T(node_ptr);
+void H(node_ptr);
+void F(node_ptr);
+void V(node_ptr);
+void I(node_ptr);
 void synAna(FILE*,node_ptr,C_List*);
 void eat(type,node_ptr);
 
