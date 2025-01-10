@@ -78,13 +78,11 @@ int eat(type what,node_ptr root){
 
 void S(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'S');
-    //R(temp);
+    if(W(temp)==-1){
+        fprintf(stderr,"W syntactic error!\n");
+        return;
+    }
     O(temp);
-}
-
-void R(node_ptr root){
-    node_ptr temp = addToParseTree_NonTer(root,'R');
-    
 }
 
 void O(node_ptr root){
@@ -108,48 +106,64 @@ void O(node_ptr root){
 int W(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'W');
     if(Q(temp)==-1){
+        fprintf(stderr,"Q syntactic error!\n");
         return -1;
     }
     if(eat(L_BRACE,temp)==-1){
+        fprintf(stderr,"W match error!\n");
         return -1;
     }
-    M(temp);
+    if(M(temp)==-1){
+        fprintf(stderr,"M syntactic error!\n");
+        return -1;
+    }
     if(eat(R_BRACE,temp)==-1){
+        fprintf(stderr,"W match error!\n");
         return -1;
     }
-}
-
-void Y(node_ptr root){
-    node_ptr temp = addToParseTree_NonTer(root,'Y');
+    return 0;
 }
 
 int Q(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'Q');
-    P(temp);
-    eat(L_PAR,temp);
-    P(temp);
-    eat(R_PAR,temp);
+    if(P(temp)==-1){
+        return -1;
+    }
+    if(eat(L_PAR,temp)==-1){
+        fprintf(stderr,"W match error!\n");
+        return -1;
+    }
+    if(P(temp)==-1){
+        return -1;
+    }
+    if(eat(L_PAR,temp)==-1){
+        fprintf(stderr,"W match error!\n");
+        return -1;
+    }
 }
 
 int M(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'M');
-    T(temp);
-    H(temp);
+    if(T(temp)==-1)return -1;
+    if(H(temp)==-1)return -1;
+    return 0;
 }
 
-void P(node_ptr root){
+int P(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'P');
     switch (temp_type){
-    case INT:
-        eat(INT,temp);
-        eat(ID,temp);
-        break;
-    case VOID:
-        eat(VOID,temp);
-        break;
-    default:
-        fprintf(stderr,"P syntactic error!\n");
+        case INT:
+            eat(INT,temp);
+            eat(ID,temp);
+            break;
+        case VOID:
+            eat(VOID,temp);
+            break;
+        default:
+            fprintf(stderr,"P syntactic error!\n");
+            return -1;
     }
+    return 0;
 }
 
 void Z(node_ptr root){
@@ -170,27 +184,57 @@ int T(node_ptr root){
             eat(ID,temp);
             eat(SEMI,temp);
             break;
-        case VOID:
-            eat(VOID,temp);
-            eat(ID,temp);
-            eat(SEMI,temp);
-            break; 
         case ID:
             eat(ID,temp);
             eat(SIGNAL_EQUAL,temp);
-            A(temp);
-            eat(SEMI,temp);
-            break;
-        case INPUT:
-            eat(INPUT,temp);
-            eat(L_PAR,temp);
-            eat(R_PAR,temp);
-            break;
+            if(temp_type==INPUT){
+                eat(INPUT,temp);
+                eat(L_PAR,temp);
+                eat(R_PAR,temp);
+                eat(SEMI,temp);
+                break;
+            }
+            if(temp_type==ID){
+                eat(ID,temp);
+                if(temp_type!=L_PAR){
+                    B(temp);
+                    eat(SEMI,temp);
+                    break;
+                }
+                eat(L_PAR,temp);
+                if(temp_type==ID){
+                    eat(ID,temp);
+                }
+                eat(R_PAR,temp);
+                eat(SEMI,temp);
+                break;
+            }
+            if(temp_type==C_NUM){
+                eat(C_NUM,temp);
+                eat(SEMI,temp);
+                break;
+            }
         case OUTPUT:
             eat(OUTPUT,temp);
             eat(L_PAR,temp);
             A(temp);
             eat(R_PAR,temp);
+            eat(SEMI,temp);
+            break;
+        case RETURN:
+            eat(RETURN,temp);
+            if(temp_type==ID){
+                eat(ID,temp);
+                eat(SEMI,temp);
+                break;
+            }
+            if(temp_type==C_NUM){
+                eat(C_NUM,temp);
+                eat(SEMI,temp);
+                break;
+            }
+            A(temp);
+            eat(SEMI,temp);
             break;
         default:
             return -1;
@@ -201,10 +245,10 @@ int T(node_ptr root){
 int H(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'H');
     if(T(temp)==-1){
-        return -1;
+        return 0;
     }
     if(H(temp)==-1){
-        return -1;
+        return 0;
     }
     return 0;
 }
@@ -236,6 +280,14 @@ void V(node_ptr root){
             eat(EQUAL,temp);
             A(temp);
             break;
+        case LESS:
+            eat(LESS,temp);
+            A(temp);
+            break;
+        case MORE:
+            eat(MORE,temp);
+            A(temp);
+            break;
         default:
             fprintf(stderr,"V syntactic error!\n");
     }
@@ -247,15 +299,33 @@ void I(node_ptr root){
     eat(L_PAR,temp);
     V(temp);
     eat(R_PAR,temp);
-    eat(L_BRACE,temp);
-    M(temp);
-    eat(R_BRACE,temp);
-    eat(ELSE,temp);
-    eat(L_BRACE,temp);
-    M(temp);
-    eat(R_BRACE,temp);
+    switch (temp_type){
+        case L_BRACE:
+            eat(L_BRACE,temp);
+            M(temp);
+            eat(R_BRACE,temp);
+            break;
+        default:
+            T(temp);
+            eat(SEMI,temp);
+    }
+    switch (temp_type){
+        case ELSE:
+            eat(ELSE,temp);
+            switch (temp_type){
+                case L_BRACE:
+                    eat(L_BRACE,temp);
+                    M(temp);
+                    eat(R_BRACE,temp);
+                    break;
+                default:
+                    T(temp);
+                    eat(SEMI,temp);
+            }
+            break;
+        default:
+    }
 }
-
 
 void A(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'A');
@@ -332,8 +402,7 @@ void synAna(FILE* ff,node_ptr root,C_List* cll){
     temp_token = malloc(sizeof(token));
     token_clear(temp_token); 
     
-    lexAna(f,temp_token,cl);
-    temp_type = temp_token->kind_num;
+    temp_type = lexAna(f,temp_token,cl);
 
     S(root);
 }

@@ -1,5 +1,2 @@
-void main(void){
-    int a;
-    output(a);
-    
-}
+/*the maximum of three numbers*/
+int

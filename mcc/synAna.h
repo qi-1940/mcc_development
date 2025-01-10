@@ -48,20 +48,18 @@ void B(node_ptr);
 void C(node_ptr);
 void D(node_ptr);
 void E(node_ptr);
-void R(node_ptr);
 void O(node_ptr);
-void W(node_ptr);
-void Y(node_ptr);
-void Q(node_ptr);
-void M(node_ptr);
-void P(node_ptr);
+int W(node_ptr);
+int Q(node_ptr);
+int M(node_ptr);
+int P(node_ptr);
 void Z(node_ptr);
 int T(node_ptr);
-void H(node_ptr);
+int H(node_ptr);
 void F(node_ptr);
 void V(node_ptr);
 void I(node_ptr);
 void synAna(FILE*,node_ptr,C_List*);
-void eat(type,node_ptr);
+int eat(type,node_ptr);
 
 #endif

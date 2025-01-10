@@ -53,6 +53,7 @@ int main(int argc,char *argv[]){
     cl = malloc(sizeof(list_len));
     C_List_init(cl);
 
+
     if(!feof(f)&&!ferror(f)){
         synAna(f,root,cl);
     }
