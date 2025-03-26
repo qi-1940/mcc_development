@@ -1,17 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "lexAna.h"
 #include "synAna.h"
 #include "C_List.h"
+#include "global.h"
 
 /*
     Usage:
-    假设我当前目录下有一文件“test.cmm”，
-    meanwhile,"mcc" is under the current directory,
-    (in Windows)在当前目录下打开终端，输入“mcc test.cmm”，
-    (in Linux)Please input "./mcc test.cmm".
-     
+    Mcc is used to compile the file.
+    By now,only lexical analysis and syntax analysis were realized.
+    Suppose there is a file called "test.cmm" in the current working directory.
+    Meanwhile,"mcc" is under the current directory,
+    (in Windows)open the terminal and input "mcc test.cmm",
+    (in Linux)open the terminal and input "./mcc test.cmm".
 */
 
 /*
@@ -29,11 +29,10 @@
     10. C--语言不支持数组和递归函数。
 */
 
-
 int main(int argc,char *argv[]){
     //打开文件
-    FILE* f = fopen(argv[1],"r");
-    if(f == NULL){
+    FILE* f1 = fopen(argv[1],"r");
+    if(f1 == NULL){
         fprintf(stderr,"Opening process failed.\n");
         return 0;
     }
@@ -41,32 +40,27 @@ int main(int argc,char *argv[]){
         fprintf(stderr,"Input parameters' fault!\n");
         return 0;
     }
-
     //词法和语法分析
+    object_ptr obj_p;
+    obj_p =(object_ptr) malloc(sizeof(object));
+    obj_p->f=f1;
+    obj_p->root =(node_ptr) malloc(sizeof(node));
+    nodeInit(obj_p->root);
+    obj_p->cl =(C_List*) malloc(sizeof(C_List));
+    C_List_init(obj_p->cl);
 
-    //Parse tree's root node.
-    node_ptr root;
-    root = malloc(sizeof(node));
-    nodeInit(root);
-    
-    C_List* cl;
-    cl = malloc(sizeof(list_len));
-    C_List_init(cl);
-
-
-    if(!feof(f)&&!ferror(f)){
-        synAna(f,root,cl);
+    if(!feof(f1)&&!ferror(f1)){
+        synAna(obj_p);
     }
 
-    showParseTree(root);
+    showParseTree(obj_p->root);
 
     //showC_List(cl);
-    //语义分析
 
     //关闭文件
-    free(cl);
-    free(root);
-
+    free(obj_p->cl);
+    free(obj_p->root);
+    free(obj_p);
     /*
         If do not ignore the line below,error will be thrown out in ubuntu,which 
         will do not happen in windows.
@@ -74,3 +68,4 @@ int main(int argc,char *argv[]){
     //fclose(f);
     return 0;
 }
+

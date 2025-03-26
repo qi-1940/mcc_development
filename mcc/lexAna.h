@@ -1,8 +1,7 @@
 #ifndef LEXANA_H
 #define LEXANA_H
 
-#include "C_List.h"
-#include "restrictions.h"
+#include "global.h"
 
 typedef union{
     char valu[token_max+1];
@@ -12,13 +11,14 @@ typedef union{
 typedef struct{
     va val;
     int kind_num;
-}token;//the return of the lexi cal function
+}token;//the return of the lexical function
+
 void token_clear(token*);
-void token_crea(C_List*,token*,char*);
+void token_crea(C_List* cl,token* t,char* input);
 
 char get(FILE*);//Get a char.Skip the possible blankspaces.
-char getc_er(FILE*);
+char getc_er(FILE*);//Get a char safely.
 
-int lexAna(FILE* f,token*,C_List*);
+type lexAna(FILE* f,token*,C_List*);
 
 #endif

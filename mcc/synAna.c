@@ -3,15 +3,15 @@
 
 #include "synAna.h"
 #include "lexAna.h"
-#include "restrictions.h"
+#include "global.h"
 
 FILE* f=NULL;
 C_List* cl =NULL;
 type temp_type = 0;
 
-//The function is used just after one node_ptr was assigned meomory. 
+//The function is used just after one node_ptr was assigned memory. 
 void nodeInit(node_ptr root){
-    root->flag=-1;
+    root->flag=UNKOWN;
     root->chil_num=0;
     root->fa_node =NULL;
     for(int i =0;i<CHILD_NUM_MAX;i++){
@@ -21,13 +21,13 @@ void nodeInit(node_ptr root){
 
 void showParseTree(node_ptr input){
     switch(input->flag){
-        case -1:
+        case UNKOWN:
             fprintf(stderr,"Empty parse tree!\n");
             break;
-        case 0://The input node is a terminal node.
+        case TERMINAL:
             printf("[%d]\n",input->value.kind);
             break;
-        case 1://The input node is a nonterminal node.
+        case NONTERMINAL:
             printf("[%c,%d]\n",input->value.nonTermi,input->chil_num);
             for (int i = 0; i < input->chil_num; i++){
                 showParseTree(input->chil_nodes[i]);
@@ -41,22 +41,22 @@ void showParseTree(node_ptr input){
 void addToParseTree_Ter(node_ptr root){//Add the new terminal node to tree.
     node_ptr new_node_ptr = malloc(sizeof(node));
     nodeInit(new_node_ptr);
-    new_node_ptr->flag=0;
+    new_node_ptr->flag=TERMINAL;
     root->chil_nodes[root->chil_num++] = new_node_ptr;
     new_node_ptr->fa_node=root;
     new_node_ptr->value.kind=temp_type;
 }
 
 node_ptr addToParseTree_NonTer(node_ptr root,char nonTe){
-    if(root->flag==-1){//if the root of the tree is lost
+    if(root->flag==UNKOWN){//If the root of the tree is lost.
         root->value.nonTermi=nonTe;
-        root->flag=1;
+        root->flag=NONTERMINAL;
         return root;
     }
-    else{//add children of the root
+    else{//Add child node to the root.
         node_ptr new_node_ptr = malloc(sizeof(node));
         nodeInit(new_node_ptr);
-        new_node_ptr->flag=1;
+        new_node_ptr->flag=NONTERMINAL;
         root->chil_nodes[root->chil_num++] = new_node_ptr;
         new_node_ptr->fa_node=root;
         new_node_ptr->value.nonTermi=nonTe;
@@ -89,6 +89,14 @@ void O(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'O');
     switch (temp_type){
         case VOID:
+            O_case_VOID(temp);
+	    break;
+        default:
+            fprintf(stderr,"O syntactic error!\n");
+    }
+}
+
+void O_case_VOID(node_ptr temp){
             eat(VOID,temp);
             eat(MAIN,temp);
             eat(L_PAR,temp);
@@ -97,10 +105,6 @@ void O(node_ptr root){
             eat(L_BRACE,temp);
             M(temp);
             eat(R_BRACE,temp);
-            break;
-        default:
-            fprintf(stderr,"O syntactic error!\n");
-    }
 }
 
 int W(node_ptr root){
@@ -241,6 +245,8 @@ int T(node_ptr root){
     }
     return 0;
 }
+
+
 
 int H(node_ptr root){
     node_ptr temp = addToParseTree_NonTer(root,'H');
@@ -393,16 +399,15 @@ void E(node_ptr root){
     }
 }
 
-void synAna(FILE* ff,node_ptr root,C_List* cll){
-    f = ff;
-    cl = cll;
-    type temp=-1;
+void synAna(object_ptr obj_p){
+    
+    type temp=0;
 
     token* temp_token;
     temp_token = malloc(sizeof(token));
     token_clear(temp_token); 
     
-    temp_type = lexAna(f,temp_token,cl);
+    temp_type = lexAna(obj_p->f,temp_token,obj_p->cl);
 
-    S(root);
+    S(obj_p->root);
 }

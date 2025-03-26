@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "lexAna.h"
 #include "C_List.h"
+#include "global.h"
 
 /*
     words and tokens' list:
@@ -33,9 +34,8 @@
     ),23,-
     {,24,-
     },25,-
-    identifiers,26,indicator in tokens' list
-    const_nums,27,indicator in num list
-    
+    identifiers,26,indicator in C_list
+    const_nums,27,indicator in C_list
 */
 
 void token_clear(token * t){
@@ -82,52 +82,32 @@ void token_crea(C_List* cl,token* t,char* input){
 }
 
 char get(FILE *f){//Get a char.Skip the possible blankspaces.
-    if(feof(f)!=0){
-        fprintf(stderr,"File is empty!\n");
-        return '\0';
-    }
-    if(ferror(f)!=0){
-
-        fprintf(stderr,"File reading process failed!\n");
-        return '\0';
-    }
     char temp = getc_er(f);
-    while(feof(f)==0 && ferror(f)==0 && isspace((int)temp)){
-        if(feof(f)!=0){
-            fprintf(stderr,"File is empty!\n");
-            return '\0';
-        }
-        if(ferror(f)!=0){
-            fprintf(stderr,"File reading process failed!\n");
-            return '\0';
-        }
+    while(isspace((int)temp)){
         temp = getc_er(f);
     }
     return temp;
 }
 
-char getc_er(FILE* f){
+char getc_er(FILE* f){//Get a char safely.
     if(!feof(f)&&!ferror(f)){
         return getc(f);
     }
-    else if(feof(f)){
+    if(feof(f)){
         fprintf(stderr,"File went to the end but the program still wants to get a charater!\n");
-        return EOF;
     }
-    else{
+    if(ferror(f)){
         fprintf(stderr,"The process of reading file meets problems!\n");
-        return EOF;
     }
-
+    return EOF;
 }
 
 /*
-    The lexAna() function return one token 
-    from a file indicator 
-    every time it is called.
+    The lexAna() function returns the kind_num of the newest token gotten from a file indicator when it is called.
 */
-int lexAna(FILE * f,token* output,C_List* cl){
+type lexAna(FILE* f,token* output,C_List* cl){
     char temp;
+
     if((temp=getc(f))==EOF)return 0;
     ungetc(temp,f);
     temp = get(f);
